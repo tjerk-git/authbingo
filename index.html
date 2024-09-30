@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bingo Card</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+
+    <style>
+      .faq {
+        margin-top: 20px;
+      }
+
+      .faq-item {
+        margin-bottom: 15px;
+      }
+
+      .faq-item h3 {
+        margin: 0;
+        font-size: 18px;
+      }
+
+      .faq-item p {
+        margin: 5px 0 0;
+        font-size: 16px;
+      }
+    </style>
+    </main>
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f0f0f0;
+      }
+
+      .bingo-card {
+        max-width: 400px;
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        margin: 0 auto;
+      }
+
+      .bingo-cell {
+        width: 60px;
+        height: 60px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 24px;
+        font-weight: bold;
+        border: 2px solid #333;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      .bingo-cell.struck {
+        text-decoration: line-through;
+        background-color: #ffcccc;
+      }
+    </style>
+  </head>
+
+  <body>
+
+    <main>
+      <h1>NHL STENDEN AUTH BINGO</h1>
+      <p>We just love using two factor twenty times a day</p>
+
+      <div class="bingo-card" id="bingoCard"></div>
+
+      <footer>
+        <section class="faq">
+          <h2>Frequently Asked Questions</h2>
+          <div class="faq-item">
+            <h3>What is NHL Stenden Auth Bingo?</h3>
+            <p>NHL Stenden Auth Bingo is a fun game where you mark off numbers on a bingo card as you encounter them in
+              your daily authentication processes.</p>
+          </div>
+          <div class="faq-item">
+            <h3>How do I play?</h3>
+            <p>Simply click on the numbers on your bingo card as you encounter them. The numbers will be struck through
+              to
+              indicate they have been marked.</p>
+          </div>
+          <div class="faq-item">
+            <h3>Can I reset my bingo card?</h3>
+            <p>Yes,
+              <button onclick="localStorage.clear(); location.reload();">Reset Bingo Card</button>
+            </p>
+          </div>
+        </section>
+      </footer>
+    </main>
+    <script>
+      const bingoCard = document.getElementById('bingoCard');
+      let numbers = JSON.parse(localStorage.getItem('bingoNumbers'));
+      let struckNumbers = JSON.parse(localStorage.getItem('struckNumbers')) || [];
+
+      function generateNumbers() {
+        const newNumbers = [];
+        while (newNumbers.length < 25) {
+          const num = Math.floor(Math.random() * 90) + 10;
+          if (!newNumbers.includes(num)) {
+            newNumbers.push(num);
+          }
+        }
+        return newNumbers;
+      }
+
+      // Generate numbers if they don't exist in localStorage
+      if (!numbers) {
+        numbers = generateNumbers();
+        localStorage.setItem('bingoNumbers', JSON.stringify(numbers));
+      }
+
+      // Create bingo card cells
+      numbers.forEach((number, index) => {
+        const cell = document.createElement('div');
+        cell.classList.add('bingo-cell');
+        cell.textContent = number;
+        if (struckNumbers.includes(number)) {
+          cell.classList.add('struck');
+        }
+        cell.addEventListener('click', () => toggleStrike(number));
+        bingoCard.appendChild(cell);
+      });
+
+      function toggleStrike(number) {
+        const index = struckNumbers.indexOf(number);
+        if (index === -1) {
+          struckNumbers.push(number);
+        } else {
+          struckNumbers.splice(index, 1);
+        }
+        localStorage.setItem('struckNumbers', JSON.stringify(struckNumbers));
+        updateCard();
+      }
+
+      function updateCard() {
+        const cells = bingoCard.querySelectorAll('.bingo-cell');
+        cells.forEach(cell => {
+          const number = parseInt(cell.textContent);
+          if (struckNumbers.includes(number)) {
+            cell.classList.add('struck');
+          } else {
+            cell.classList.remove('struck');
+          }
+        });
+      }
+    </script>
+  </body>
+
+</html>
